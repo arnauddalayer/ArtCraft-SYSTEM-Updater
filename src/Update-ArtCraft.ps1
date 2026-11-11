@@ -1,23 +1,23 @@
-<#
+﻿<#
 .SYNOPSIS
-    Installe / met a jour les applications ArtCraft en MSI "systemwide" (ALLUSERS=1).
+    Installe / met à jour les applications ArtCraft en MSI "systemwide" (ALLUSERS=1).
 
 .DESCRIPTION
-    - Trouve la derniere version via la redirection github.com/<org>/<app>/releases/latest
+    - Trouve la dernière version via la redirection github.com/<org>/<app>/releases/latest
       (aucune consommation du quota de l'API GitHub).
-    - Telecharge le MSI de l'architecture courante et le verifie avec le SHA256SUMS.txt de la release.
-    - Utilise un cache partage (cheminCache, ex. \\serveur\partage\ArtCraft) : le premier poste qui
-      trouve une nouvelle version alimente le cache, les autres ne telechargent rien depuis Internet.
-    - Concu pour tourner en SYSTEM depuis une tache planifiee.
+    - Télécharge le MSI de l'architecture courante et le vérifie avec le SHA256SUMS.txt de la release.
+    - Utilise un cache partagé (cheminCache, ex. \\serveur\partage\ArtCraft) : le premier poste qui
+      trouve une nouvelle version alimente le cache, les autres ne téléchargent rien depuis Internet.
+    - Conçu pour tourner en SYSTEM depuis une tâche planifiée.
 
 .PARAMETER cheminConfig
-    Fichier de configuration JSON (par defaut : Update-ArtCraft.json a cote du script).
+    Fichier de configuration JSON (par défaut : Update-ArtCraft.json à côté du script).
 
 .PARAMETER dryRun
-    Affiche ce qui serait fait sans rien telecharger ni installer.
+    Affiche ce qui serait fait sans rien télécharger ni installer.
 
 .PARAMETER forcer
-    Installe meme si un utilisateur est connecte.
+    Installe même si un utilisateur est connecté.
 #>
 [CmdletBinding()]
 param(
@@ -43,7 +43,7 @@ foreach ($dossier in $dossierRacine, $dossierJournaux, $dossierTemporaire) {
 
 Start-Transcript -Path (Join-Path $dossierJournaux ("Update-{0}.log" -f (Get-Date -Format "yyyy-MM-dd"))) -Append | Out-Null
 
-# Une seule execution a la fois (le mutex est libere automatiquement si le processus meurt)
+# Une seule exécution à la fois (le mutex est libéré automatiquement si le processus meurt)
 $mutex = New-Object System.Threading.Mutex($false, "Global\ArtCraftSystemUpdater")
 $possedeMutex = $false
 $echecs = 0
@@ -85,7 +85,7 @@ function obtenirVersionInstallee([string]$nomAffiche) {
     return $null
 }
 
-# Derniere version via la redirection /releases/latest -> /releases/tag/<tag> (sans API)
+# Dernière version via la redirection /releases/latest -> /releases/tag/<tag> (sans API)
 function obtenirDernierTagGitHub([string]$organisation, [string]$depot) {
     $requete = [Net.HttpWebRequest]::Create("https://github.com/$organisation/$depot/releases/latest")
     $requete.AllowAutoRedirect = $false
@@ -105,7 +105,7 @@ function obtenirDernierTagGitHub([string]$organisation, [string]$depot) {
     return [Uri]::UnescapeDataString($Matches[1])
 }
 
-# Tag le plus recent, en passant d'abord par le cache (partage ou local) pour limiter les requetes
+# Tag le plus récent, en passant d'abord par le cache (partagé ou local) pour limiter les requêtes
 function obtenirDernierTag([string]$organisation, [string]$depot, [string]$racineCache, [bool]$ecriturePermise, [int]$ageMaxMinutes, [bool]$githubPermis) {
     $fichierDernier = Join-Path (Join-Path $racineCache $depot) "latest.txt"
     $tagEnCache = $null
@@ -158,7 +158,7 @@ function verifierFichier([string]$cheminFichier, [string]$cheminSommes, [string]
     return ((Get-FileHash $cheminFichier -Algorithm SHA256).Hash.ToLowerInvariant() -eq $hashAttendu)
 }
 
-# Copie atomique : fichier temporaire puis renommage (plusieurs postes peuvent ecrire en meme temps)
+# Copie atomique : fichier temporaire puis renommage (plusieurs postes peuvent écrire en même temps)
 function publierFichier([string]$source, [string]$destination) {
     $temporaire = "$destination.$([guid]::NewGuid().ToString('N')).tmp"
     try {
@@ -179,7 +179,7 @@ function supprimerAnciennesVersions([string]$cacheDepot, [int]$nombreAGarder) {
         }
 }
 
-# Retourne le chemin local (dossier temporaire) d'un MSI dont le SHA-256 est verifie
+# Retourne le chemin local (dossier temporaire) d'un MSI dont le SHA-256 est vérifié
 function obtenirMsiVerifie([string]$organisation, [string]$depot, [string]$tag, [string]$arch, [string]$racineCache, [bool]$ecriturePermise, [int]$nombreAGarder, [bool]$githubPermis) {
     $version = $tag.TrimStart("v")
     $nomFichier = "$depot-$version-windows-$arch.msi"
@@ -238,8 +238,8 @@ function obtenirMsiVerifie([string]$organisation, [string]$depot, [string]$tag, 
     return $msiLocal
 }
 
-# Poste maitre : si le cache n'a pas le MSI du dernier tag (ex. partage inaccessible lors d'un passage precedent),
-# on le telecharge et on l'y publie, meme si l'application est deja a jour localement.
+# Poste maître : si le cache n'a pas le MSI du dernier tag (ex. partage inaccessible lors d'un passage précédent),
+# on le télécharge et on l'y publie, même si l'application est déjà à jour localement.
 function completerCache([string]$organisation, [string]$depot, [string]$tag, [string]$arch, [string]$racineCache, [bool]$ecriturePermise, [int]$nombreAGarder, [bool]$githubPermis) {
     if (!$ecriturePermise -or !$githubPermis -or $dryRun) { return }
     $nomFichier = "$depot-$($tag.TrimStart('v'))-windows-$arch.msi"
@@ -275,7 +275,7 @@ function testerSessionActive {
     return $false
 }
 
-# Le MSI (ALLUSERS=1) cree ses raccourcis sur le bureau public uniquement
+# Le MSI (ALLUSERS=1) crée ses raccourcis sur le bureau public uniquement
 function supprimerRaccourcisBureau([string[]]$noms, [bool]$simulation) {
     $dossier = [Environment]::GetFolderPath("CommonDesktopDirectory")
     foreach ($nom in $noms) {
@@ -306,7 +306,7 @@ try {
         try {
             if (Test-Path -LiteralPath $cheminCentral -ErrorAction Stop) {
                 $centrale = Get-Content -LiteralPath $cheminCentral -Raw -ErrorAction Stop | ConvertFrom-Json
-                # Fusion : les cles de la config centrale remplacent celles de la config locale
+                # Fusion : les clés de la config centrale remplacent celles de la config locale
                 foreach ($propriete in $centrale.PSObject.Properties) {
                     if ($propriete.Name -ne "cheminConfigCentrale") {
                         $config | Add-Member -NotePropertyName $propriete.Name -NotePropertyValue $propriete.Value -Force
@@ -381,7 +381,7 @@ try {
             ecrireJournal "$nom : $depart -> $derniereVersion"
             if ($dryRun) { continue }
 
-            # On alimente le cache meme si l'installation est reportee
+            # On alimente le cache même si l'installation est reportée
             $msi = obtenirMsiVerifie $organisation $depot $tag $arch             $racineCache $ecriturePermise $nombreAGarder $githubPermis
                         if (!$msi) { continue }
                         if ($sessionActive) {

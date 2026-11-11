@@ -1,10 +1,10 @@
-<#
+﻿<#
 .SYNOPSIS
-    Desinstalle l'updater ArtCraft : supprime la tache planifiee, desinstalle les applications
-    listees dans la configuration (MSI systemwide) et supprime C:\ProgramData\ArtCraft-SYSTEM-Updater.
+    Désinstalle l'updater ArtCraft : supprime la tâche planifiée, désinstalle les applications
+    listées dans la configuration (MSI systemwide) et supprime C:\ProgramData\ArtCraft-SYSTEM-Updater.
 
 .PARAMETER conserverApplications
-    Ne desinstalle pas les applications, retire seulement la tache planifiee et les fichiers de l'updater.
+    Ne désinstalle pas les applications, retire seulement la tâche planifiée et les fichiers de l'updater.
 #>
 [CmdletBinding()]
 param(
@@ -17,7 +17,7 @@ $dossierInstallation = Join-Path $env:ProgramData "ArtCraft-SYSTEM-Updater"
 $nomTache = "ArtCraft-SYSTEM-Updater"
 $echecs = 0
 
-# Evite qu'une mise a jour en cours installe une application pendant la desinstallation
+# Évite qu'une mise à jour en cours installe une application pendant la désinstallation
 $mutex = New-Object System.Threading.Mutex($false, "Global\ArtCraftSystemUpdater")
 if (!$mutex.WaitOne(120000)) {
     Write-Host "Une mise a jour est en cours depuis plus de 2 minutes, desinstallation annulee."

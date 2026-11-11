@@ -1,7 +1,7 @@
 ﻿<#
 .SYNOPSIS
-    Deploie l'updater ArtCraft sur le poste : copie les fichiers, cree la tache planifiee (SYSTEM)
-    et la demarre (c'est la tache qui installe ensuite les applications listees dans la configuration).
+    Déploie l'updater ArtCraft sur le poste : copie les fichiers, crée la tâche planifiée (SYSTEM)
+    et la démarre (c'est la tâche qui installe ensuite les applications listées dans la configuration).
 #>
 $ErrorActionPreference = "Stop"
 
@@ -24,7 +24,7 @@ $action = New-ScheduledTaskAction `
     -Execute "PowerShell.exe" `
     -Argument "-ExecutionPolicy Bypass -NoProfile -NonInteractive -File `"$dossierInstallation\Update-ArtCraft.ps1`""
 
-# Repetition toutes les heures, avec un decalage aleatoire pour etaler la charge sur le partage
+# Répétition toutes les heures, avec un décalage aléatoire pour étaler la charge sur le partage
 $declencheur = New-ScheduledTaskTrigger -Once -At (Get-Date) `
     -RepetitionInterval (New-TimeSpan -Hours $intervalleHeures) `
     -RandomDelay (New-TimeSpan -Minutes 10)
@@ -48,6 +48,6 @@ Register-ScheduledTask `
 
 Write-Host "Tache '$nomTache' creee."
 
-# La tache fait l'installation initiale des applications
+# La tâche fait l'installation initiale des applications
 Start-ScheduledTask -TaskName $nomTache
 Write-Host "Tache '$nomTache' demarree."
