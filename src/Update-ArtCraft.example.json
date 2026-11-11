@@ -1,0 +1,18 @@
+{
+  "applications": [
+    "PhotoCraft",
+    "VectorCraft",
+    "FilmCraft",
+    "PdfCraft"
+  ],
+  "organisation": "storytold",
+  "cheminCache": "",
+  "ecritureCache": false,
+  "telechargementGitHub": false,
+  "dureeCacheDernierTagMinutes": 60,
+  "versionsAConserver": 2,
+  "installerManquantes": true,
+  "reporterSiSessionOuverte": true,
+  "supprimerRaccourcisBureau": true,
+  "cheminConfigCentrale": ""
+}

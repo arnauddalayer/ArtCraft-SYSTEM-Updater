@@ -1,0 +1,6 @@
+# Configuration locale (contient des chemins propres au poste)
+/src/Update-ArtCraft.json
+
+# Documentation locale
+.old/
+AGENTS.md
